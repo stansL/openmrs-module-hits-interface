@@ -1,6 +1,5 @@
 package org.openmrs.module.hits.mapping;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.joda.time.DateTime;

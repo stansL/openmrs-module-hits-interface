@@ -12,7 +12,7 @@
 	
 	<developers>
 		<developer>
-			<name>gwasilwa</name>
+			<name>HISS Devs</name>
 		</developer>
 	</developers>
 	
@@ -96,6 +96,17 @@
 			</dependency>
 						
 			<!-- End OpenMRS core -->
+			<dependency>
+				<groupId>org.kemricdc</groupId>
+				<artifactId>Hl7Module</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+				<exclusions>
+					<exclusion>
+						<groupId>ca.uhn.hapi</groupId>
+						<artifactId>hapi</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
 
 		</dependencies>
 	</dependencyManagement>

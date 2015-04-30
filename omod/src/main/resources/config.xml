@@ -49,6 +49,14 @@
 		<point>org.openmrs.api.EncounterService</point>
 		<class>org.openmrs.module.hits.advice.SaveEncounterAdvice</class>
 	</advice>
+	
+	<globalProperty>
+		<property>hits.propertiesFileLocation</property>
+		<defaultValue></defaultValue>
+		<description>
+			Location of the app.properties file used by the hits module 
+		</description>
+	</globalProperty>
 
 </module>
 
