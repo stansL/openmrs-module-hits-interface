@@ -11,8 +11,6 @@ import org.openmrs.module.hits.HITSConstants;
 
 public class PatientDetailsMapping {
 
-	private static final int HEI_ID = 8;
-	private static final int HITS_ID = 9;
 	private Patient patient;
 
 	public Patient getPatient() {
@@ -28,8 +26,8 @@ public class PatientDetailsMapping {
 	}
 
 	public void mapPatientDetails(Map<String, String> values) {
-		PatientIdentifier hitsIdentifier = patient.getPatientIdentifier(Context.getPatientService().getPatientIdentifierType(HITS_ID));
-		PatientIdentifier heiIdentifier = patient.getPatientIdentifier(Context.getPatientService().getPatientIdentifierType(HEI_ID));
+		PatientIdentifier hitsIdentifier = patient.getPatientIdentifier(Context.getPatientService().getPatientIdentifierType(HITSConstants.HITS_IDENTIFIER_TYPE_ID));
+		PatientIdentifier heiIdentifier = patient.getPatientIdentifier(Context.getPatientService().getPatientIdentifierType(HITSConstants.HEI_IDENTIFIER_TYPE_ID));
 		String patientUuid = patient.getUuid();
 
 		String formattedDob = new DateTime(patient.getBirthdate()).toString("yyyy/MM/dd");

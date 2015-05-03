@@ -13,4 +13,8 @@ public class HITSConstants {
 
 	public static final String PROPERTIES_FILE_LOCATION_GLOBAL_PROPERTY = "hits.propertiesFileLocation";
 	
+	public static final int HEI_IDENTIFIER_TYPE_ID = 7;
+	
+	public static final int HITS_IDENTIFIER_TYPE_ID = 9;
+	
 }

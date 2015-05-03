@@ -8,10 +8,14 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,10 +26,10 @@ import org.kemricdc.entities.AppProperties;
 import org.kemricdc.entities.IdentifierType;
 import org.kemricdc.entities.Person;
 import org.kemricdc.entities.PersonIdentifier;
+import org.kemricdc.entities.Sex;
 import org.kemricdc.hapi.EventsHl7Service;
 import org.kemricdc.hapi.IHL7Service;
 import org.kemricdc.hapi.util.OruFiller;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.hits.HITSConstants;
 import org.openmrs.module.hits.HITSUtil;
 import org.openmrs.module.hits.HITSResponse;
@@ -136,6 +140,7 @@ public class HttpClient implements Runnable {
 	    // TODO Auto-generated method stub
 		List<OruFiller> fillers = new ArrayList<OruFiller>();
 		AppProperties appProperties = new AppPropertiesLoader(new AppProperties()).getAppProperties();
+		DateFormat format = new SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH);
 		Person person = new Person();
 	    for (Map.Entry<String, String> parameter : this.parameters.entrySet()) {
 			if (parameter.getKey() == HITSConstants.HEI_ID) {
@@ -155,8 +160,7 @@ public class HttpClient implements Runnable {
 				identifiers.add(pIdentifier);
 				person.setPersonIdentifiers(identifiers);
 				continue;
-			} 
-			
+			} 			
 			if (parameter.getKey() == HITSConstants.OPENMRS_UUID) {
 				Set<PersonIdentifier> identifiers = new HashSet<PersonIdentifier>();
 				PersonIdentifier pIdentifier = new PersonIdentifier();
@@ -165,13 +169,30 @@ public class HttpClient implements Runnable {
 				identifiers.add(pIdentifier);
 				person.setPersonIdentifiers(identifiers);
 				continue;
-			} 
-			
+			}			
+			if (parameter.getKey().equalsIgnoreCase("infant_dob")) {
+				try {
+					person.setDob(format.parse(parameter.getValue()));
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				continue;
+			}
+			if (parameter.getKey().equalsIgnoreCase("infant_gender")) {
+				if(parameter.getValue().equalsIgnoreCase("F")){
+					person.setSex(Sex.FEMALE);
+				}
+				else if(parameter.getValue().equalsIgnoreCase("M")){
+					person.setSex(Sex.MALE);
+				}				
+				continue;
+			}
 			if (parameter.getKey() == HITSConstants.MOTHER_ID) {
 				person.setMotherId(parameter.getValue());
 				continue;
-			}
-	    	OruFiller parameterOruFiller = new OruFiller();
+			}			
+			
+			OruFiller parameterOruFiller = new OruFiller();
 			parameterOruFiller.setCodingSystem((String) appProperties.getProperty("coding_system"));
 			parameterOruFiller.setObservationIdentifier(parameter.getKey());
 			parameterOruFiller.setObservationValue(parameter.getValue());
@@ -184,15 +205,12 @@ public class HttpClient implements Runnable {
 
 	@Override
 	public void run() {
-		Context.openSession();
 		try {
 			sendPatientToHITS();
 		} catch (MalformedURLException e) {
 			log.error(e.getMessage());
 		} catch (IOException e) {
 			log.error(e.getMessage());
-		} finally {
-			Context.closeSession();
 		}
 	}
 
