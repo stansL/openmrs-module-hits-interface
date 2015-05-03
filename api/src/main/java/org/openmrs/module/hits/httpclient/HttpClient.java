@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.kemricdc.constants.Triggers;
 import org.kemricdc.entities.AppProperties;
 import org.kemricdc.entities.IdentifierType;
+import org.kemricdc.entities.MaritalStatus;
 import org.kemricdc.entities.Person;
 import org.kemricdc.entities.PersonIdentifier;
 import org.kemricdc.entities.Sex;
@@ -42,6 +43,8 @@ import com.google.gson.GsonBuilder;
 public class HttpClient implements Runnable {
 	
 	protected Log log = LogFactory.getLog(getClass());
+	
+	private final String token = "K3mr1CdcT35t";
 	
 	private Map<String,String> parameters;
 	
@@ -69,7 +72,6 @@ public class HttpClient implements Runnable {
 	public void sendPatientToHITS() throws MalformedURLException, IOException {
 
 		String url = "http://www.hitsystem.net/API/components/apiRecord.cfc";		
-		String token = "K3mr1CdcT35t";
 		String urlParameters = "";
 		DataOutputStream output;
 		HttpURLConnection connection;
@@ -142,32 +144,28 @@ public class HttpClient implements Runnable {
 		AppProperties appProperties = new AppPropertiesLoader(new AppProperties()).getAppProperties();
 		DateFormat format = new SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH);
 		Person person = new Person();
+		Set<PersonIdentifier> identifiers = new HashSet<PersonIdentifier>();
+		person.setMaritalStatus(MaritalStatus.MISSING);
 	    for (Map.Entry<String, String> parameter : this.parameters.entrySet()) {
 			if (parameter.getKey() == HITSConstants.HEI_ID) {
-				Set<PersonIdentifier> identifiers = new HashSet<PersonIdentifier>();
 				PersonIdentifier pIdentifier = new PersonIdentifier();
 				pIdentifier.setIdentifierType(IdentifierType.HEI);
 				pIdentifier.setIdentifier(parameter.getValue());
 				identifiers.add(pIdentifier);
-				person.setPersonIdentifiers(identifiers);
 				continue;
 			} 
 			if (parameter.getKey() == HITSConstants.HITS_ID) {
-				Set<PersonIdentifier> identifiers = new HashSet<PersonIdentifier>();
 				PersonIdentifier pIdentifier = new PersonIdentifier();
 				pIdentifier.setIdentifierType(IdentifierType.HITS);
 				pIdentifier.setIdentifier(parameter.getValue());
 				identifiers.add(pIdentifier);
-				person.setPersonIdentifiers(identifiers);
 				continue;
 			} 			
 			if (parameter.getKey() == HITSConstants.OPENMRS_UUID) {
-				Set<PersonIdentifier> identifiers = new HashSet<PersonIdentifier>();
 				PersonIdentifier pIdentifier = new PersonIdentifier();
 				pIdentifier.setIdentifierType(IdentifierType.OPENMRSUUID);
 				pIdentifier.setIdentifier(parameter.getValue());
-				identifiers.add(pIdentifier);
-				person.setPersonIdentifiers(identifiers);
+				identifiers.add(pIdentifier);				
 				continue;
 			}			
 			if (parameter.getKey().equalsIgnoreCase("infant_dob")) {
@@ -198,6 +196,14 @@ public class HttpClient implements Runnable {
 			parameterOruFiller.setObservationValue(parameter.getValue());
 			fillers.add(parameterOruFiller);
         }
+	    
+	    OruFiller parameterOruFiller = new OruFiller();
+		parameterOruFiller.setCodingSystem((String) appProperties.getProperty("coding_system"));
+		parameterOruFiller.setObservationIdentifier("token");
+		parameterOruFiller.setObservationValue(token);
+		fillers.add(parameterOruFiller);
+		
+	    person.setPersonIdentifiers(identifiers);
 	    
 	    IHL7Service hl7Service = new EventsHl7Service(person, fillers, appProperties);
 	    hl7Service.doWork(Triggers.R01.getValue());
