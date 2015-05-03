@@ -14,6 +14,7 @@ import org.springframework.aop.AfterReturningAdvice;
 
 public class SavePatientAdvice implements AfterReturningAdvice {
 
+	private static final String DEFAULT_CLINIC_ID = "48";
 	private Log log = LogFactory.getLog(this.getClass());
 	final int HEI_IDENTIFIER_TYPE_ID = 8;
 	final int HITS_IDENTIFIER_TYPE_ID = 9;
@@ -35,7 +36,7 @@ public class SavePatientAdvice implements AfterReturningAdvice {
 							savedPatient);
 					patientDetailsMapping.mapPatientDetails(parameters);
 
-					parameters.put("clinic_id", "48");
+					parameters.put("clinic_id", DEFAULT_CLINIC_ID);
 					parameters.put("method", "APIcreateRecord");
 					HttpClient httpClient = new HttpClient();
 					httpClient.setParameters(parameters);
