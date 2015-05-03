@@ -8,13 +8,28 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.kemricdc.constants.Triggers;
+import org.kemricdc.entities.AppProperties;
+import org.kemricdc.entities.IdentifierType;
+import org.kemricdc.entities.Person;
+import org.kemricdc.entities.PersonIdentifier;
+import org.kemricdc.hapi.EventsHl7Service;
+import org.kemricdc.hapi.IHL7Service;
+import org.kemricdc.hapi.util.OruFiller;
+import org.openmrs.module.hits.HITSConstants;
 import org.openmrs.module.hits.HITSPatientService;
 import org.openmrs.module.hits.HITSResponse;
 import org.openmrs.module.hits.HITSResponseDeserializer;
+import org.openmrs.module.hits.utils.AppPropertiesLoader;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -81,6 +96,13 @@ public class HttpClient implements Runnable {
 		finally {
 			output.close();
 		}
+		
+		int responseCode = connection.getResponseCode();
+		List<Integer> errorResponseCode = Arrays.asList(404,408);
+		
+		if (errorResponseCode.contains(responseCode)) {
+			saveParametersToFileSystem();
+		}
 
 		InputStream response = connection.getInputStream();
 		BufferedReader br = new BufferedReader(new InputStreamReader(
@@ -110,6 +132,36 @@ public class HttpClient implements Runnable {
 		connection.disconnect();
 		
 	}
+
+	private void saveParametersToFileSystem() {
+	    // TODO Auto-generated method stub
+		List<OruFiller> fillers = new ArrayList<OruFiller>();
+		AppProperties appProperties = new AppPropertiesLoader(new AppProperties()).getAppProperties();
+		Person person = new Person();
+	    for (Map.Entry<String, String> parameter : this.parameters.entrySet()) {
+			if (parameter.getKey() == HITSConstants.HEI_ID) {
+				Set<PersonIdentifier> identifiers = new HashSet<PersonIdentifier>();
+				PersonIdentifier pIdentifier = new PersonIdentifier();
+				pIdentifier.setIdentifierType(IdentifierType.HEI);
+				pIdentifier.setIdentifier(parameter.getValue());
+				identifiers.add(pIdentifier);
+				person.setPersonIdentifiers(identifiers);
+				continue;
+			}
+			if (parameter.getKey() == HITSConstants.MOTHER_ID) {
+				person.setMotherId(parameter.getValue());
+				continue;
+			}
+	    	OruFiller parameterOruFiller = new OruFiller();
+			parameterOruFiller.setCodingSystem((String) appProperties.getProperty("coding_system"));
+			parameterOruFiller.setObservationIdentifier(parameter.getKey());
+			parameterOruFiller.setObservationValue(parameter.getValue());
+			fillers.add(parameterOruFiller);
+        }
+	    
+	    IHL7Service hl7Service = new EventsHl7Service(person, fillers, appProperties);
+	    hl7Service.doWork(Triggers.R01.getValue());
+    }
 
 	@Override
 	public void run() {

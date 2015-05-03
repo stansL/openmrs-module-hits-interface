@@ -63,6 +63,12 @@
 				
 		<!-- End OpenMRS core -->
 		
+		<dependency>
+			<groupId>org.kemricdc</groupId>
+			<artifactId>Hl7Module</artifactId>
+			<type>jar</type>
+		</dependency>
+		
 	</dependencies>
 	
 	<build>
