@@ -25,8 +25,9 @@ import org.kemricdc.entities.PersonIdentifier;
 import org.kemricdc.hapi.EventsHl7Service;
 import org.kemricdc.hapi.IHL7Service;
 import org.kemricdc.hapi.util.OruFiller;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.hits.HITSConstants;
-import org.openmrs.module.hits.HITSPatientService;
+import org.openmrs.module.hits.HITSUtil;
 import org.openmrs.module.hits.HITSResponse;
 import org.openmrs.module.hits.HITSResponseDeserializer;
 import org.openmrs.module.hits.utils.AppPropertiesLoader;
@@ -108,24 +109,22 @@ public class HttpClient implements Runnable {
 		BufferedReader br = new BufferedReader(new InputStreamReader(
 				response));
 		String line = null;
-
-		if (parameters.get("method").equals("APIcreateRecord")) {
-			while ((line = br.readLine()) != null) {
-				log.info(line);
-				System.out.println(line);
-				HITSResponse hitsResponse = gson.fromJson(line,
-						HITSResponse.class);
-				hitsResponse.setPatientUuId(patientUuId);
-				HITSPatientService.saveHITSId(hitsResponse);
-				log.info("HITS ID: " + hitsResponse.getHitsId());
-				System.out.println("HITS ID: " + hitsResponse.getHitsId());
-			}
+		StringBuffer responseBuffer = new StringBuffer();
+		while ((line = br.readLine()) != null) {
+			log.info(line);
+			responseBuffer.append(line);				
 		}
-		else {
-			while ((line = br.readLine()) != null) {
-				log.info(line);
-				System.out.println(line);
-			}
+		HITSResponse hitsResponse = gson.fromJson(responseBuffer.toString(),
+			HITSResponse.class);
+		Boolean messageSuccess = HITSUtil.checkMessageStatus(hitsResponse);
+		if (!messageSuccess) {
+			saveParametersToFileSystem();
+		}
+		else if (parameters.get("method").equals("APIcreateRecord")) {			
+			hitsResponse.setPatientUuId(patientUuId);
+			HITSUtil.saveHITSId(hitsResponse);
+			log.info("HITS ID: " + hitsResponse.getHitsId());
+			System.out.println("HITS ID: " + hitsResponse.getHitsId());
 		}
 		br.close();
 		output.close();
@@ -165,12 +164,15 @@ public class HttpClient implements Runnable {
 
 	@Override
 	public void run() {
+		Context.openSession();
 		try {
 			sendPatientToHITS();
 		} catch (MalformedURLException e) {
 			log.error(e.getMessage());
 		} catch (IOException e) {
 			log.error(e.getMessage());
+		} finally {
+			Context.closeSession();
 		}
 	}
 
