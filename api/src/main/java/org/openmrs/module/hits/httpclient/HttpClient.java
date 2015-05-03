@@ -146,7 +146,27 @@ public class HttpClient implements Runnable {
 				identifiers.add(pIdentifier);
 				person.setPersonIdentifiers(identifiers);
 				continue;
-			}
+			} 
+			if (parameter.getKey() == HITSConstants.HITS_ID) {
+				Set<PersonIdentifier> identifiers = new HashSet<PersonIdentifier>();
+				PersonIdentifier pIdentifier = new PersonIdentifier();
+				pIdentifier.setIdentifierType(IdentifierType.HITS);
+				pIdentifier.setIdentifier(parameter.getValue());
+				identifiers.add(pIdentifier);
+				person.setPersonIdentifiers(identifiers);
+				continue;
+			} 
+			
+			if (parameter.getKey() == HITSConstants.OPENMRS_UUID) {
+				Set<PersonIdentifier> identifiers = new HashSet<PersonIdentifier>();
+				PersonIdentifier pIdentifier = new PersonIdentifier();
+				pIdentifier.setIdentifierType(IdentifierType.OPENMRSUUID);
+				pIdentifier.setIdentifier(parameter.getValue());
+				identifiers.add(pIdentifier);
+				person.setPersonIdentifiers(identifiers);
+				continue;
+			} 
+			
 			if (parameter.getKey() == HITSConstants.MOTHER_ID) {
 				person.setMotherId(parameter.getValue());
 				continue;

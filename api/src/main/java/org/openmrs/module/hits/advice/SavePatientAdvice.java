@@ -19,21 +19,16 @@ public class SavePatientAdvice implements AfterReturningAdvice {
 	final int HEI_IDENTIFIER_TYPE_ID = 8;
 	final int HITS_IDENTIFIER_TYPE_ID = 9;
 
-	public void afterReturning(Object returnValue, Method method,
-			Object[] args, Object target) throws Throwable {
+	public void afterReturning(Object returnValue, Method method, Object[] args, Object target) throws Throwable {
 		Map<String, String> parameters = new HashMap<String, String>();
 		if (method.getName().equals("savePatient")) {
 			log.info("Method: " + method.getName());
 			Patient savedPatient = (Patient) returnValue;
 
-			if (savedPatient.getPatientIdentifier(Context.getPatientService()
-					.getPatientIdentifierType(HITS_IDENTIFIER_TYPE_ID)) == null) {
-				if (savedPatient.getPatientIdentifier(Context
-						.getPatientService().getPatientIdentifierType(
-								HEI_IDENTIFIER_TYPE_ID)) != null) {
-					
-					PatientDetailsMapping patientDetailsMapping = new PatientDetailsMapping(
-							savedPatient);
+			if (savedPatient.getPatientIdentifier(Context.getPatientService().getPatientIdentifierType(HITS_IDENTIFIER_TYPE_ID)) == null) {
+				if (savedPatient.getPatientIdentifier(Context.getPatientService().getPatientIdentifierType(HEI_IDENTIFIER_TYPE_ID)) != null) {
+
+					PatientDetailsMapping patientDetailsMapping = new PatientDetailsMapping(savedPatient);
 					patientDetailsMapping.mapPatientDetails(parameters);
 
 					parameters.put("clinic_id", DEFAULT_CLINIC_ID);

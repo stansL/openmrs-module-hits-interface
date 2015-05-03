@@ -7,6 +7,7 @@ import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.Relationship;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.hits.HITSConstants;
 
 public class PatientDetailsMapping {
 
@@ -29,6 +30,7 @@ public class PatientDetailsMapping {
 	public void mapPatientDetails(Map<String, String> values) {
 		PatientIdentifier hitsIdentifier = patient.getPatientIdentifier(Context.getPatientService().getPatientIdentifierType(HITS_ID));
 		PatientIdentifier heiIdentifier = patient.getPatientIdentifier(Context.getPatientService().getPatientIdentifierType(HEI_ID));
+		String patientUuid = patient.getUuid();
 
 		String formattedDob = new DateTime(patient.getBirthdate()).toString("yyyy/MM/dd");
 
@@ -43,10 +45,14 @@ public class PatientDetailsMapping {
 		}
 
 		if (hitsIdentifier != null) {
-			values.put("hitsid", hitsIdentifier.getIdentifier());
+			values.put(HITSConstants.HITS_ID, hitsIdentifier.getIdentifier());
 		}
 		if (heiIdentifier != null) {
-			values.put("infant_ID", heiIdentifier.getIdentifier());
+			values.put(HITSConstants.HEI_ID, heiIdentifier.getIdentifier());
+		}
+		
+		if(patientUuid != null){
+			values.put(HITSConstants.OPENMRS_UUID, patientUuid);
 		}
 		values.put("infant_dob", formattedDob);
 		values.put("infant_gender", patient.getGender());
