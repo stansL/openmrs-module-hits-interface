@@ -118,6 +118,7 @@ public class HttpClient implements Runnable {
 		StringBuffer responseBuffer = new StringBuffer();
 		while ((line = br.readLine()) != null) {
 			log.info(line);
+			System.out.println(line);
 			responseBuffer.append(line);				
 		}
 		HITSResponse hitsResponse = gson.fromJson(responseBuffer.toString(),

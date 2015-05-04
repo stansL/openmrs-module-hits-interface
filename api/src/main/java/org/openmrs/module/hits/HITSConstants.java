@@ -10,7 +10,7 @@ public class HITSConstants {
 	
 	public static final String HEI_ID = "infant_ID";
 	
-	public static final String HITS_ID = "hits_ID";
+	public static final String HITS_ID = "HITSID";
 	
 	public static final String OPENMRS_UUID = "openmrs_uuid";
 
@@ -20,6 +20,6 @@ public class HITSConstants {
 	
 	public static final int HITS_IDENTIFIER_TYPE_ID = 9;
 	
-	public static final List<Integer> HEI_FORM_IDS = Arrays.asList(38,89);
+	public static final List<Integer> HEI_FORM_IDS = Arrays.asList(38,88);
 	
 }

@@ -26,7 +26,7 @@ public class HITSUtil {
 		hitsIdentifier.setIdentifierType(hitsIdentifierType);
 		hitsIdentifier.setIdentifier(response.getHitsId());
 		patient.addIdentifier(hitsIdentifier);
-		System.out.println("Patient Identifier Count" + patient.getActiveIdentifiers().size());
+		System.out.println("Patient Identifier Count " + patient.getActiveIdentifiers().size());
 		try {
 			Context.getPatientService().savePatient(patient);
 		}
