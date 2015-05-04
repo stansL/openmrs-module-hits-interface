@@ -7,6 +7,7 @@ import java.util.Map;
 import org.joda.time.DateTime;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
+import org.openmrs.module.hits.HITSConstants;
 import org.openmrs.module.hits.httpclient.HttpClient;
 import org.openmrs.module.hits.mapping.PatientDetailsMapping;
 import org.springframework.aop.AfterReturningAdvice;
@@ -28,7 +29,7 @@ public class SaveEncounterAdvice implements AfterReturningAdvice {
 
 			values.put("method", "APIupdateRecord");
 
-			if (encounter.getForm().getFormId() == 36) {
+			if (HITSConstants.HEI_FORM_IDS.contains(encounter.getForm().getFormId())) {
 				for (Obs obs : encounter.getObs()) {
 					switch (obs.getConcept().getConceptId()) {
 					case 7046:

@@ -1,5 +1,8 @@
 package org.openmrs.module.hits;
 
+import java.util.Arrays;
+import java.util.List;
+
 
 public class HITSConstants {
 	
@@ -16,5 +19,7 @@ public class HITSConstants {
 	public static final int HEI_IDENTIFIER_TYPE_ID = 7;
 	
 	public static final int HITS_IDENTIFIER_TYPE_ID = 9;
+	
+	public static final List<Integer> HEI_FORM_IDS = Arrays.asList(38,89);
 	
 }
