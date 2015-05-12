@@ -15,7 +15,6 @@ import org.springframework.aop.AfterReturningAdvice;
 
 public class SavePatientAdvice implements AfterReturningAdvice {
 
-	private static final String DEFAULT_CLINIC_ID = "48";
 	private Log log = LogFactory.getLog(this.getClass());
 
 	public void afterReturning(Object returnValue, Method method, Object[] args, Object target) throws Throwable {
@@ -30,7 +29,7 @@ public class SavePatientAdvice implements AfterReturningAdvice {
 					PatientDetailsMapping patientDetailsMapping = new PatientDetailsMapping(savedPatient);
 					patientDetailsMapping.mapPatientDetails(parameters);
 
-					parameters.put("clinic_id", DEFAULT_CLINIC_ID);
+					parameters.put("clinic_id", String.valueOf(HITSConstants.DEFAULT_CLINIC_ID));
 					parameters.put("method", "APIcreateRecord");
 					HttpClient httpClient = new HttpClient();
 					httpClient.setParameters(parameters);
