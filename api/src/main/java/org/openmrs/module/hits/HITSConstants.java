@@ -22,4 +22,6 @@ public class HITSConstants {
 	
 	public static final List<Integer> HEI_FORM_IDS = Arrays.asList(38,88);
 	
+	public static final int DEFAULT_CLINIC_ID = 23;
+	
 }
