@@ -152,12 +152,12 @@ public class SaveEncounterAdvice implements AfterReturningAdvice {
 					}
 
 				}
+				HttpClient httpClient = new HttpClient();
+				httpClient.setParameters(values);
+				Thread thread = new Thread(httpClient);
+				thread.run();
 			}
 
-			HttpClient httpClient = new HttpClient();
-			httpClient.setParameters(values);
-			Thread thread = new Thread(httpClient);
-			thread.run();
 		}
 
 	}
