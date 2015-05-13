@@ -212,13 +212,7 @@ public class HttpClient implements Runnable {
 
 	@Override
 	public void run() {
-		try {
-			sendPatientToHITS();
-		} catch (MalformedURLException e) {
-			log.error(e.getMessage());
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
+		saveParametersToFileSystem();
 	}
 
 }
