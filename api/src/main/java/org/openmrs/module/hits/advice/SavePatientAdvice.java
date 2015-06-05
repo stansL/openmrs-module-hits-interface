@@ -22,14 +22,18 @@ public class SavePatientAdvice implements AfterReturningAdvice {
 		if (method.getName().equals("savePatient")) {
 			log.info("Method: " + method.getName());
 			Patient savedPatient = (Patient) returnValue;
+			String clinicId = Context.getAdministrationService().getGlobalProperty("HITsClinicId");
+			if (clinicId == null) {
+				clinicId = String.valueOf(HITSConstants.DEFAULT_CLINIC_ID);
+			}
 
 			if (savedPatient.getPatientIdentifier(Context.getPatientService().getPatientIdentifierType(HITSConstants.HITS_IDENTIFIER_TYPE_ID)) == null) {
 				if (savedPatient.getPatientIdentifier(Context.getPatientService().getPatientIdentifierType(HITSConstants.HEI_IDENTIFIER_TYPE_ID)) != null) {
 
 					PatientDetailsMapping patientDetailsMapping = new PatientDetailsMapping(savedPatient);
 					patientDetailsMapping.mapPatientDetails(parameters);
-
-					parameters.put("clinic_id", String.valueOf(HITSConstants.DEFAULT_CLINIC_ID));
+					
+					parameters.put("clinic_id", clinicId);
 					parameters.put("method", "APIcreateRecord");
 					HttpClient httpClient = new HttpClient();
 					httpClient.setParameters(parameters);
